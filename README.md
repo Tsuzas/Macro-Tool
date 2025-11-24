@@ -13,7 +13,17 @@ A simple Python GUI application for creating and executing keyboard macros to au
 
 ## Screenshots
 
-*( FUTURE PRINTSCREEN OF THE APPLICATION )*
+### MAIN PAGE
+![MAIN PAGE](media/mainMenu.png)
+
+### MACRO LIST
+![MACRO LIST](media/macroList.png)
+
+### MACRO EXECUTE WINDOW
+![MACRO EXECUTE](media/macroExecute.png)
+
+### MACRO IN ACTION
+![MACRO ACTION](media/macroAction.gif)
 
 ## Requirements
 
