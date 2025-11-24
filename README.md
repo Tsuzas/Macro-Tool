@@ -65,7 +65,7 @@ The tool stores your text macros in a `sentences.json` file and uses the `pynput
 
 ## License
 
-This project is licensed under the MIT License – see the LICENSE file for details.
+This project is not licensed – see the LICENSE file for details or check https://unlicense.org/.
 
 ## Author
 
