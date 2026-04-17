@@ -69,12 +69,12 @@ def saveSettings():
     # =================== DELAY SPEED SETTINGS ========================== #
     delayHolder = delayOption.get()
     if delayHolder == "Default is: 5 seconds." or delayHolder == "":
-        delayWindow = 5.0
+        delayValue = 5.0
         messagebox.showinfo("Empty Field Detected", "Delay empty → Defaulting to 5 seconds.")
     else:
-        delayWindow = float(delayHolder)
+        delayValue= float(delayHolder)
 
-    settingList["delay_speed"] = delayWindow  
+    settingList["delay_speed"] = delayValue  
     # =================================================================== #
 
     # ====================== MACRO SPEEDSETTINGS ======================= #
