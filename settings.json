@@ -1,5 +1,5 @@
 {
-    "delay_speed": 1.0,
-    "macro_speed": 0.01,
-    "loops": 2.0
+    "delay_speed": 5.0,
+    "macro_speed": 0.1,
+    "loops": 10.0
 }

@@ -4,6 +4,14 @@ import time
 import tkinter as tk
 from pynput.keyboard import Controller, Key
 from tkinter import simpledialog, messagebox
+import os
+
+#CHANGES THE JSON PATH TO THE CURRENT FOLDER
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+# JSON PATHS FOR SETTINGS AND SENTENCES
+settings_path = os.path.join(BASE_DIR, "settings.json")
+sentences_path = os.path.join(BASE_DIR, "sentences.json")
 
 # Quick function to clear Input field where user types
 def clearInput():
@@ -18,7 +26,7 @@ def saveMacro(event=None):
     else:
         macro = userOption.get()
         sentenceList.append(macro)
-        with open("sentences.json", "w") as f:
+        with open(sentences_path, "w") as f:
             json.dump(sentenceList, f)
         messagebox.showinfo("Saved", f"Macro saved: {macro}")
         clearInput()
@@ -39,7 +47,7 @@ def editMacro():
             messagebox.showinfo("Canceled", "Empty input. Leaving...")
         else:
             sentenceList[macroEdit] = editMode
-            with open("sentences.json", "w") as f:
+            with open(sentences_path, "w") as f:
                 json.dump(sentenceList, f)
             messagebox.showinfo("Edited", "Macro edited successfully!")
     else:
@@ -49,7 +57,7 @@ def editMacro():
 #     # VIA jSon #
 def loadSettings():
     try:
-        with open("settings.json", "r") as f:
+        with open(settings_path, "r") as f:
             return json.load(f)
     except:
         # Default values if file doesn't exist
@@ -100,7 +108,8 @@ def saveSettings():
     # =================================================================== #
 
     # Saves JSON
-    with open("settings.json", "w") as f:
+    
+    with open(settings_path, "w") as f:
         json.dump(settingList, f, indent=4)
 
     messagebox.showinfo("Saved", "Settings saved successfully!")
@@ -124,7 +133,7 @@ def resetMacros():
     global sentenceList
     
     sentenceList = []
-    with open("sentences.json", "w") as f:
+    with open(sentences_path, "w") as f:
         json.dump(sentenceList, f, indent=4)
     messagebox.showinfo("MACROS Reset","All your macros were sucessfully deleted")
     
@@ -306,7 +315,7 @@ def mainMenu():
     settingList = loadSettings()
     
     try:
-        with open("sentences.json", "r") as f:
+        with open(sentences_path, "r") as f:
             content = f.read()
             sentenceList = json.loads(content)
     except Exception as e:
@@ -366,6 +375,7 @@ def goBackMenu():
     
     # Re assigns the proper command on the button.
     selectButton.config(text="Choose", command=optionSelect)
+    
 
 # Start the app
 mainMenu()
