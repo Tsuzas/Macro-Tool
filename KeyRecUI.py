@@ -1,10 +1,17 @@
+import os
 import sys
 import json
 import time
 import tkinter as tk
+from pynput import keyboard
 from pynput.keyboard import Controller, Key
 from tkinter import simpledialog, messagebox
-import os
+
+# LISTENER VARIABLE FLAG
+listenerTrigger = False
+
+# LISTENER FOR OPTIONS TO KEEP RUNNING
+optionsFlag = True
 
 #CHANGES THE JSON PATH TO THE CURRENT FOLDER
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -232,81 +239,101 @@ def settingsWindow():
 
 # Options of app with their subsequent code
 def optionSelect(event=None):
-    global userOption, mainLabel, selectButton, sentenceList, topFrame
-    try:
-        option = int(userOption.get())
-    except ValueError:
-        messagebox.showerror("Error", "Please enter a valid number.")
-        return
+    ## LIST OF OPTION  = [1, 2 ,3 ,4 ,8 ,9]
+    
+    while optionsFlag == True:
+        global userOption, mainLabel, selectButton, sentenceList, topFrame
+        try:
+            option = int(userOption.get())
+        except ValueError:
+            messagebox.showerror("Error", "Please enter a valid number.")
+            return
 
-    # Gets Sentence from Input then uses function SaveMacro()
-    if option == 1:
-        clearInput()
-        mainLabel.config(text="Write the sentence you wish to add below:\n\nEmpty input will count as aborted")
-        selectButton.config(text="Add Macro", command=saveMacro)
+        # Gets Sentence from Input then uses function SaveMacro()
+        if option == 1:
+            clearInput()
+            mainLabel.config(text="Write the sentence you wish to add below:\n\nEmpty input will count as aborted")
+            selectButton.config(text="Add Macro", command=saveMacro)
 
-    # Shows all Sentences from Array on a Quick Window
-    elif option == 2:
-        clearInput()
-        if not sentenceList:
-            messagebox.showinfo("Macros", "No macros saved yet.")
-        else:
+        # Shows all Sentences from Array on a Quick Window
+        elif option == 2:
+            clearInput()
+            if not sentenceList:
+                messagebox.showinfo("Macros", "No macros saved yet.")
+            else:
+                infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
+                messagebox.showinfo("Macro List", infoText)
+
+        # If no macros, quick display alerting User, if there's Sentences editMacro()
+        elif option == 3:
+            clearInput()
+            if not sentenceList:
+                messagebox.showinfo("Macros", "No macros to edit.")
+            else:
+                editMacro()
+
+        # Lets User choose which macro to replicate
+        elif option == 4:
+            clearInput()
+            if not sentenceList:
+                messagebox.showinfo("Macros", "No macros saved yet.")
+                return
+
             infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
-            messagebox.showinfo("Macro List", infoText)
+            macroEdit = simpledialog.askinteger("Macro List", f"Choose the macro to execute:\n{infoText}")
 
-    # If no macros, quick display alerting User, if there's Sentences editMacro()
-    elif option == 3:
-        clearInput()
-        if not sentenceList:
-            messagebox.showinfo("Macros", "No macros to edit.")
+            # Simple error handling
+            if macroEdit is None or not (0 <= macroEdit < len(sentenceList)):
+                messagebox.showinfo("Cancelled", "Invalid selection.")
+                return
+
+            macroWord = sentenceList[macroEdit]
+            
+            #ASKS FOR LISTENER
+            permission = allowListener()
+            if permission == 1:
+                while listenerTrigger != True:
+                    time.sleep(0.1)
+
+                # What types for you
+                kb = Controller()
+                loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                for _ in range(loops):
+                    for letter in macroWord:
+                        print(letter)
+                        kb.tap(letter)
+                        time.sleep(settingList["macro_speed"])
+                    kb.tap(Key.enter)
+                messagebox.showinfo("Success", "The macro was executed successfully.")
+                listener.stop()
+            else:
+                # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
+                messagebox.showinfo(
+                    "Macro Starting...",
+                    f'-- {macroWord} -- will start typing in {settingList["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
+                )
+                time.sleep(settingList["delay_speed"])
+                # What types for you
+                kb = Controller()
+                loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                for _ in range(loops):
+                    for letter in macroWord:
+                        kb.tap(letter)
+                        time.sleep(settingList["macro_speed"])
+                    kb.tap(Key.enter)
+                messagebox.showinfo("Success", "The macro was executed successfully.")
+            
+        # Settings
+        elif option == 8:
+            settingsWindow()
+        # Exits app
+        elif option == 9:
+            sys.exit()
         else:
-            editMacro()
-
-    # Lets User choose which macro to replicate
-    elif option == 4:
-        clearInput()
-        if not sentenceList:
-            messagebox.showinfo("Macros", "No macros saved yet.")
-            return
-
-        infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
-        macroEdit = simpledialog.askinteger("Macro List", f"Choose the macro to execute:\n{infoText}")
-
-        # Simple error handling
-        if macroEdit is None or not (0 <= macroEdit < len(sentenceList)):
-            messagebox.showinfo("Cancelled", "Invalid selection.")
-            return
-
-        macroWord = sentenceList[macroEdit]
-
-        # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
-        messagebox.showinfo(
-            "Macro Starting...",
-            f'-- {macroWord} -- will start typing in {settingList["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
-        )
-        time.sleep(settingList["delay_speed"])
+            messagebox.showerror("Warning", "Noone of the options were selected")
+            clearInput()
 
 
-        # What types for you
-        kb = Controller()
-        loops = int(settingList["loops"])  # convert to int para rodar no FOR
-        for _ in range(loops):
-            for letter in macroWord:
-                kb.tap(letter)
-                time.sleep(settingList["macro_speed"])
-            kb.tap(Key.enter)
-
-        
-
-        messagebox.showinfo("Success", "The macro was executed successfully.")
-        exit()
-
-    # Settings
-    elif option == 8:
-        settingsWindow()
-    # Exits app
-    elif option == 9:
-        sys.exit()
 
 # App's Main Menu and UI
 def mainMenu():
@@ -375,8 +402,37 @@ def goBackMenu():
     
     # Re assigns the proper command on the button.
     selectButton.config(text="Choose", command=optionSelect)
-    
 
-# Start the app
+def on_press(key):
+        global listenerTrigger
+        if key == keyboard.Key.esc:
+            return  
+        elif key == keyboard.Key.f10:
+            listenerTrigger = True
+            return
+        try:
+            k = key.char  # single-char keys
+        except:
+            k = key.name  # other keys
+        if k in ['1', '2', 'left', 'right']:  # keys of interest
+            # self.keys.append(k)  # store it in global-like variable
+            print('Key pressed: ' + k)
+            return False  # stop listener; remove this if want more keys 
+           
+def allowListener():
+    global userOption, listener
+    response = messagebox.askquestion("Allow Listener", "Would you like it to listen for a hotkey press (default F10) to initiate or start right now?")
+
+    if response == "yes":
+        messagebox.showinfo("Listening!", "The app is currently listening for a keypress, to stop it press (Esc) to stop or close the app.")
+        # STARTS LISTENER
+        listener = keyboard.Listener(on_press=on_press)
+        listener.start()  # start to listen on a separate thread
+        #listener.join()  # remove if main thread is polling self.keys
+
+        return 1
+    else: return
+
+
+# Start the App
 mainMenu()
-
