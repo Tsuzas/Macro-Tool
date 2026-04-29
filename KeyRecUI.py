@@ -243,96 +243,99 @@ def optionSelect(event=None):
     
     while optionsFlag == True:
         global userOption, mainLabel, selectButton, sentenceList, topFrame
+
+
+        # TRY CATCH 
+        # FLOATS, STRINGS AND EMPTY VALUES
         try:
             option = int(userOption.get())
         except ValueError:
             messagebox.showerror("Error", "Please enter a valid number.")
             return
 
-        # Gets Sentence from Input then uses function SaveMacro()
-        if option == 1:
-            clearInput()
-            mainLabel.config(text="Write the sentence you wish to add below:\n\nEmpty input will count as aborted")
-            selectButton.config(text="Add Macro", command=saveMacro)
+        match option:
+            # Gets Sentence from Input then uses function SaveMacro()
+            case 1:
+                clearInput()
+                mainLabel.config(text="Write the sentence you wish to add below:\n\nEmpty input will count as aborted")
+                selectButton.config(text="Add Macro", command=saveMacro)
 
-        # Shows all Sentences from Array on a Quick Window
-        elif option == 2:
-            clearInput()
-            if not sentenceList:
-                messagebox.showinfo("Macros", "No macros saved yet.")
-            else:
+            # Shows all Sentences from Array on a Quick Window
+            case 2:
+                clearInput()
+                if not sentenceList:
+                    messagebox.showinfo("Macros", "No macros saved yet.")
+                else:
+                    infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
+                    messagebox.showinfo("Macro List", infoText)
+            case 3:
+                # If no macros, quick display alerting User, if there's Sentences editMacro()
+                clearInput()
+                if not sentenceList:
+                    messagebox.showinfo("Macros", "No macros to edit.")
+                else:
+                    editMacro()
+            case 4:
+                clearInput()
+                if not sentenceList:
+                    messagebox.showinfo("Macros", "No macros saved yet.")
+                    return
+            
+                # Lets User choose which macro to replicate
                 infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
-                messagebox.showinfo("Macro List", infoText)
+                macroEdit = simpledialog.askinteger("Macro List", f"Choose the macro to execute:\n{infoText}")
 
-        # If no macros, quick display alerting User, if there's Sentences editMacro()
-        elif option == 3:
-            clearInput()
-            if not sentenceList:
-                messagebox.showinfo("Macros", "No macros to edit.")
-            else:
-                editMacro()
+                # Simple error handling
+                if macroEdit is None or not (0 <= macroEdit < len(sentenceList)):
+                    messagebox.showinfo("Cancelled", "Invalid selection.")
+                    return
 
-        # Lets User choose which macro to replicate
-        elif option == 4:
-            clearInput()
-            if not sentenceList:
-                messagebox.showinfo("Macros", "No macros saved yet.")
-                return
+                macroWord = sentenceList[macroEdit]
 
-            infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
-            macroEdit = simpledialog.askinteger("Macro List", f"Choose the macro to execute:\n{infoText}")
+                #ASKS FOR LISTENER
+                permission = allowListener()
+                if permission == 1:
+                    while listenerTrigger != True:
+                        time.sleep(0.1)
 
-            # Simple error handling
-            if macroEdit is None or not (0 <= macroEdit < len(sentenceList)):
-                messagebox.showinfo("Cancelled", "Invalid selection.")
-                return
-
-            macroWord = sentenceList[macroEdit]
+                    # What types for you
+                    kb = Controller()
+                    loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                    for _ in range(loops):
+                        for letter in macroWord:
+                            print(letter)
+                            kb.tap(letter)
+                            time.sleep(settingList["macro_speed"])
+                        kb.tap(Key.enter)
+                    messagebox.showinfo("Success", "The macro was executed successfully.")
+                    listener.stop()
+                else:
+                    # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
+                    messagebox.showinfo(
+                        "Macro Starting...",
+                        f'-- {macroWord} -- will start typing in {settingList["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
+                    )
+                    time.sleep(settingList["delay_speed"])
+                    # What types for you
+                    kb = Controller()
+                    loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                    for _ in range(loops):
+                        for letter in macroWord:
+                            kb.tap(letter)
+                            time.sleep(settingList["macro_speed"])
+                        kb.tap(Key.enter)
+                    messagebox.showinfo("Success", "The macro was executed successfully.")
+                    
+            # Settings
+            case 8:
+                settingsWindow()
+            # Exits app
+            case 9:
+                sys.exit()
             
-            #ASKS FOR LISTENER
-            permission = allowListener()
-            if permission == 1:
-                while listenerTrigger != True:
-                    time.sleep(0.1)
-
-                # What types for you
-                kb = Controller()
-                loops = int(settingList["loops"])  # convert to int para rodar no FOR
-                for _ in range(loops):
-                    for letter in macroWord:
-                        print(letter)
-                        kb.tap(letter)
-                        time.sleep(settingList["macro_speed"])
-                    kb.tap(Key.enter)
-                messagebox.showinfo("Success", "The macro was executed successfully.")
-                listener.stop()
-            else:
-                # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
-                messagebox.showinfo(
-                    "Macro Starting...",
-                    f'-- {macroWord} -- will start typing in {settingList["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
-                )
-                time.sleep(settingList["delay_speed"])
-                # What types for you
-                kb = Controller()
-                loops = int(settingList["loops"])  # convert to int para rodar no FOR
-                for _ in range(loops):
-                    for letter in macroWord:
-                        kb.tap(letter)
-                        time.sleep(settingList["macro_speed"])
-                    kb.tap(Key.enter)
-                messagebox.showinfo("Success", "The macro was executed successfully.")
-            
-        # Settings
-        elif option == 8:
-            settingsWindow()
-        # Exits app
-        elif option == 9:
-            sys.exit()
-        else:
-            messagebox.showerror("Warning", "Noone of the options were selected")
-            clearInput()
-
+            case _:
+                messagebox.showerror("Warning", "Noone of the options were selected")
+                clearInput()
 
 
 # App's Main Menu and UI
