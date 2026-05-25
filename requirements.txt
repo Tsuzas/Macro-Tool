@@ -1,0 +1,4 @@
+pip install pynput
+
+# If in linux make sure you install python3-tk so you can use tkinter
+# sudo apt install python3-tk
