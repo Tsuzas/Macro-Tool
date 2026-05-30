@@ -252,7 +252,7 @@ def settingsWindow():
 #                  Switch case with all                    #
 #             The options related code on it               #
 def optionSelect(event=None):
-    ## LIST OF OPTION  = [1, 2 ,3 ,4 ,8 ,9]
+    ## LIST OF OPTION  = [1, 2 ,3 ,4 ,5 ,8 ,9]
     
     global userOption, mainLabel, selectButton, sentenceList, topFrame
 
@@ -339,7 +339,17 @@ def optionSelect(event=None):
                         time.sleep(settingList["macro_speed"])
                     kb.tap(Key.enter)
                 messagebox.showinfo("Success", "The macro was executed successfully.")
+        #Delete specific index of Macro
+        case 5:
+            deleteMacro = simpledialog.askinteger("Delete Macro", "Choose the macro to delete:\n" + "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList)))
 
+            if deleteMacro is not None and 0 <= deleteMacro < len(sentenceList):
+                del sentenceList[deleteMacro]
+                with open(sentences_path, "w") as f:
+                    json.dump(sentenceList, f)
+                messagebox.showinfo("Success", "The macro was deleted successfully.")
+            else:
+                messagebox.showinfo("Cancelled", "Invalid selection.")
         # Settings
         case 8:
             settingsWindow()
@@ -369,7 +379,7 @@ def mainMenu():
     
     root = tk.Tk()
     root.title("Macro Tool")
-    root.geometry("250x250")
+    root.geometry("300x300")
     
     # Sets the icon for the application
     icon_path = os.path.join(BASE_DIR, "media", "icon.png")
@@ -388,6 +398,7 @@ def mainMenu():
         "[2] See your macros\n"
         "[3] Edit a macro\n"
         "[4] Execute a macro\n"
+        "[5] Delete a macro (coming soon)\n"
         "[8] Settings\n"
         "[9] Exit\n"
     ))
@@ -421,6 +432,7 @@ def goBackMenu():
         "[2] See your macros\n"
         "[3] Edit a macro\n"
         "[4] Execute a macro\n"
+        "[5] Delete a macro (coming soon)\n"
         "[8] Settings\n"
         "[9] Exit\n"
     ))
