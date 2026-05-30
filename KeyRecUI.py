@@ -7,6 +7,7 @@ from pynput import keyboard
 from pynput.keyboard import Controller, Key
 from tkinter import simpledialog, messagebox
 
+
 # LISTENER VARIABLE FLAG
 listenerTrigger = False
 
@@ -369,6 +370,11 @@ def mainMenu():
     root = tk.Tk()
     root.title("Macro Tool")
     root.geometry("250x250")
+    
+    # Sets the icon for the application
+    icon_path = os.path.join(BASE_DIR, "media", "icon.png")
+    icon = tk.PhotoImage(file=icon_path)
+    root.iconphoto(True, icon)
 
     # Create a frame to hold label and entry on same line
     topFrame = tk.Frame(root)
