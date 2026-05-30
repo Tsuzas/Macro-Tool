@@ -7,7 +7,8 @@ from pynput import keyboard
 from pynput.keyboard import Controller, Key
 from tkinter import simpledialog, messagebox
 
-
+# LISTENER VARIABLE FOR CONTINUOUS LOOPS    
+stopFlag = False
 # LISTENER VARIABLE FLAG
 listenerTrigger = False
 
@@ -254,7 +255,7 @@ def settingsWindow():
 def optionSelect(event=None):
     ## LIST OF OPTION  = [1, 2 ,3 ,4 ,5 ,8 ,9]
     
-    global userOption, mainLabel, selectButton, sentenceList, topFrame
+    global userOption, mainLabel, selectButton, sentenceList, topFrame, stopFlag, listenerTrigger
 
 
     # ===================== TRY CATCH BLOCK ===================== #
@@ -309,20 +310,24 @@ def optionSelect(event=None):
             #ASKS FOR LISTENER
             permission = allowListener()
             if permission == 1:
-                while listenerTrigger != True:
+                while stopFlag != True:
                     time.sleep(0.1)
+                    while listenerTrigger != True:
+                        time.sleep(0.1)
 
-                # What types for you
-                kb = Controller()
-                loops = int(settingList["loops"])  # convert to int para rodar no FOR
-                for _ in range(loops):
-                    for letter in macroWord:
-                        print(letter)
-                        kb.tap(letter)
-                        time.sleep(settingList["macro_speed"])
-                    kb.tap(Key.enter)
+                    # What types for you
+                    kb = Controller()
+                    loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                    for _ in range(loops):
+                        for letter in macroWord:
+                            print(letter)
+                            kb.tap(letter)
+                            time.sleep(settingList["macro_speed"])
+                        kb.tap(Key.enter)
+                    listenerTrigger = False
                 messagebox.showinfo("Success", "The macro was executed successfully.")
                 listener.stop()
+                stopFlag = False
             else:
                 # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
                 messagebox.showinfo(
@@ -445,9 +450,10 @@ def goBackMenu():
 
 # ================ LISTENER ================== #
 def on_press(key):
-        global listenerTrigger
+        global listenerTrigger, stopFlag
         if key == keyboard.Key.esc:
-            return  
+            stopFlag = True
+            return
         elif key == keyboard.Key.f10:
             listenerTrigger = True
             return
