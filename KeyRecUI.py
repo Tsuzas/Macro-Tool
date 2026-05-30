@@ -381,11 +381,14 @@ def mainMenu():
     root.title("Macro Tool")
     root.geometry("300x300")
     
-    # Sets the icon for the application
+    # Sets the icon for the application with try catch preventing error 
     icon_path = os.path.join(BASE_DIR, "media", "icon.png")
-    icon = tk.PhotoImage(file=icon_path)
-    root.iconphoto(True, icon)
-
+    try:
+        icon = tk.PhotoImage(file=icon_path)
+        root.iconphoto(True, icon)
+    except Exception as e:
+        print(f"Error loading icon: {e}")
+        pass
     # Create a frame to hold label and entry on same line
     topFrame = tk.Frame(root)
     topFrame2 = tk.Frame(root)
