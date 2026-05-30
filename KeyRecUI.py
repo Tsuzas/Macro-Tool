@@ -401,7 +401,7 @@ def mainMenu():
         "[2] See your macros\n"
         "[3] Edit a macro\n"
         "[4] Execute a macro\n"
-        "[5] Delete a macro (coming soon)\n"
+        "[5] Delete a macro\n"
         "[8] Settings\n"
         "[9] Exit\n"
     ))
@@ -435,7 +435,7 @@ def goBackMenu():
         "[2] See your macros\n"
         "[3] Edit a macro\n"
         "[4] Execute a macro\n"
-        "[5] Delete a macro (coming soon)\n"
+        "[5] Delete a macro\n"
         "[8] Settings\n"
         "[9] Exit\n"
     ))
