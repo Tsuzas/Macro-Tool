@@ -120,6 +120,17 @@ def saveSettings():
     settingList["loops"] = loop
     # =================================================================== #
 
+    # ========================== LISTENER SETTINGS ======================= #
+    listenerHolder = listenerOption.get()
+    if listenerHolder == "Default is: f10" or listenerHolder == "":
+        listener = "f10"
+        messagebox.showinfo("Empty Field Detected", "Listener key empty → Defaulting to F10.")      
+    else:
+        listener = listenerHolder
+
+    settingList["listener"] = listener
+    # =================================================================== #
+    
     # Saves JSON
     
     with open(settings_path, "w") as f:
@@ -138,6 +149,7 @@ def saveSettings():
     topFrame.pack_forget()
     topFrame2.pack_forget()
     topFrame3.pack_forget()
+    topFrame4.pack_forget()
     
     goBackMenu()
 
@@ -153,7 +165,7 @@ def resetMacros():
     
     delayOption.pack_forget()
     macroSpeedOption.pack_forget()
-    loopOption.pack_forget()
+    loopOption.pack_forget() 
     selectButton.pack_forget()
     topFrame.pack_forget()
     topFrame2.pack_forget()
@@ -181,9 +193,13 @@ def entryFocusIn(event):
         widget.delete(0, 'end')
         widget.config(fg="Black")
 
+    if widget is listenerOption and widget.get() == "Default is: f10":
+        widget.delete(0, 'end')
+        widget.config(fg="Black")
+
 # ================ CREATES SETTING WINDOWS  ================== #
 def settingsWindow():
-    global delayWindow, delayOption,macroSpeed, macroSpeedOption, loop, loopOption, resetMacrosButton, sentenceList
+    global delayWindow, delayOption,macroSpeed, macroSpeedOption, loop, loopOption, resetMacrosButton, sentenceList, listenerOption
     
     clearInput()
     root.title("Settings")
@@ -200,11 +216,14 @@ def settingsWindow():
         widget.destroy()
     for widget in topFrame3.winfo_children():
         widget.destroy()
+    for widget in topFrame4.winfo_children():
+        widget.destroy()
         
     # Show the frames
     topFrame.pack(pady=3)
     topFrame2.pack(pady=3)
     topFrame3.pack(pady=3)
+    topFrame4.pack(pady=3)
 
     
     # ======== 1st Line DELAY BEFORE MACRO =========== #
@@ -236,7 +255,17 @@ def settingsWindow():
     loopOption.insert(0, "Default is: 1 loop.")
     loopOption.bind("<FocusIn>", entryFocusIn)
     # ================================================ #
-    
+
+    # ================ LISTENER ================== #
+    listener = tk.Label(topFrame4)
+    listener.config(text="Listener Key: ")
+    listener.pack(side="left", padx=5)
+    listenerOption = tk.Entry(topFrame4, fg="Gray")
+    listenerOption.pack(side="left", padx=5)
+    listenerOption.insert(0, "Default is: f10")
+    listenerOption.bind("<FocusIn>", entryFocusIn)
+    # ================================================ #
+
     # ================ SAVING BUTTON ================== #
     selectButton.config(text="Save Settings!", command=saveSettings)
     selectButton.pack(pady=5)
@@ -370,7 +399,7 @@ def optionSelect(event=None):
 # ================ MAIN MENU ================== #
 #           Creates the first menu              #
 def mainMenu():
-    global root, userOption, mainLabel, selectButton, sentenceList, topFrame, topFrame2, topFrame3, settingList
+    global root, userOption, mainLabel, selectButton, sentenceList, topFrame, topFrame2, topFrame3, settingList, topFrame4
     
     settingList = loadSettings()
     
@@ -398,6 +427,7 @@ def mainMenu():
     topFrame = tk.Frame(root)
     topFrame2 = tk.Frame(root)
     topFrame3 = tk.Frame(root)
+    topFrame4 = tk.Frame(root)
 
     mainLabel = tk.Label(root, text=(
         "Welcome to the macro tool!\n"
@@ -451,10 +481,16 @@ def goBackMenu():
 # ================ LISTENER ================== #
 def on_press(key):
         global listenerTrigger, stopFlag
+        listenerKey = settingList["listener"].lower()  # Get the listener key from settings and convert to lowercase
+        if len(listenerKey) == 1:
+            trigger_key = keyboard.KeyCode.from_char(listenerKey)  # Convert to KeyCode for single character
+        else:
+            trigger_key = keyboard.Key[listenerKey]  # Convert to Key for special keys
+
         if key == keyboard.Key.esc:
             stopFlag = True
             return
-        elif key == keyboard.Key.f10:
+        elif key == trigger_key:
             listenerTrigger = True
             return
         try:
