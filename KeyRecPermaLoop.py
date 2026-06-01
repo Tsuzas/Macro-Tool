@@ -423,6 +423,7 @@ def mainMenu():
     except Exception as e:
         print(f"Error loading icon: {e}")
         pass
+
     # Create a frame to hold label and entry on same line
     topFrame = tk.Frame(root)
     topFrame2 = tk.Frame(root)
@@ -507,7 +508,7 @@ def on_press(key):
 #    To allow listener before macro starts     #
 def allowListener():
     global userOption, listener
-    response = messagebox.askquestion("Allow Listener?", "Would you like it to listen for a hotkey press (default F10) to initiate or start right now?")
+    response = messagebox.askquestion("Allow Listener?", f"Would you like it to listen for a hotkey press currently \"{settingList['listener']}\" to initiate or start right now?")
 
     if response == "yes":
         messagebox.showinfo("Listening!", "The app is currently listening for a keypress, to stop it press (Esc) to stop or close the app.")
