@@ -2,5 +2,6 @@
     "delay_speed": 5.0,
     "macro_speed": 0.1,
     "loops": 1,
-    "listener": "f13"
+    "listener": "f10",
+    "click": "f11"
 }
