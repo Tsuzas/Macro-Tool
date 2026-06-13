@@ -80,7 +80,8 @@ def loadSettings():
         }
 
 # ================ SAVE SETTINGS FUNCTION ================== #
-#       Defines time for input, input speed, and loops       #
+#       Defines time for input, input speed, and loops
+#                   and HotkeyListener                       #
 def saveSettings():
     global settingList, delayOption, macroSpeedOption, loopOption, delayWindow, macroSpeed, loop, delayWindow
 
@@ -91,9 +92,10 @@ def saveSettings():
     delayHolder = delayOption.get()
     if delayHolder == "Default is: 5 seconds." or delayHolder == "":
         delayValue = 5.0
-        messagebox.showinfo("Empty Field Detected", "Delay empty → Defaulting to 5 seconds.")
+        delayText = "Delay → Defaulting to 5 seconds."
     else:
         delayValue= float(delayHolder)
+        delayText = "Delay → " + str(delayValue) + " seconds."
 
     settingList["delay_speed"] = delayValue  
     # =================================================================== #
@@ -102,9 +104,10 @@ def saveSettings():
     macroHolder = macroSpeedOption.get()
     if macroHolder == "Default is: 0.1 second."or macroHolder == "":
         macro = 0.1
-        messagebox.showinfo("Empty Field Detected", "Macro speed empty → Defaulting to 0.1 seconds.")
+        macroText = "Macro → Defaulting to 0.1 seconds."
     else:
         macro = float(macroHolder)
+        macroText = "Macro → " + str(macro)
     
     settingList["macro_speed"] = macro
     # =================================================================== #
@@ -113,9 +116,10 @@ def saveSettings():
     loopHolder = loopOption.get()
     if loopHolder == "Default is: 1 loop." or loopHolder == "":
         loop = 1
-        messagebox.showinfo("Empty Field Detected", "Loop empty → Defaulting to 1 seconds.")
+        loopText = "Loop → Defaulting to 1 seconds."
     else:
         loop = float(loopHolder)
+        loopText = "Loop → " + str(loop)
    
     settingList["loops"] = loop
     # =================================================================== #
@@ -124,11 +128,13 @@ def saveSettings():
     listenerHolder = listenerOption.get()
     if listenerHolder == "Default is: f10" or listenerHolder == "":
         listener = "f10"
-        messagebox.showinfo("Empty Field Detected", "Listener key empty → Defaulting to F10.")      
+        listenerText = "Listener → Defaulting to F10."
     else:
         listener = listenerHolder
+        listenerText = "Listener → " + listenerHolder
 
     settingList["listener"] = listener
+
     # =================================================================== #
     
     # Saves JSON
@@ -136,7 +142,7 @@ def saveSettings():
     with open(settings_path, "w") as f:
         json.dump(settingList, f, indent=4)
 
-    messagebox.showinfo("Saved", "Settings saved successfully!")
+    messagebox.showinfo("Settings Saved", f"Your settings were saved successfully!\n\n{delayText}\n{macroText}\n{loopText}\n{listenerText}")
 
     delayWindow.pack_forget()
     delayOption.pack_forget()
@@ -423,7 +429,6 @@ def mainMenu():
     except Exception as e:
         print(f"Error loading icon: {e}")
         pass
-
     # Create a frame to hold label and entry on same line
     topFrame = tk.Frame(root)
     topFrame2 = tk.Frame(root)
@@ -508,7 +513,7 @@ def on_press(key):
 #    To allow listener before macro starts     #
 def allowListener():
     global userOption, listener
-    response = messagebox.askquestion("Allow Listener?", f"Would you like it to listen for a hotkey press currently \"{settingList['listener']}\" to initiate or start right now?")
+    response = messagebox.askquestion("Allow Listener?", "Would you like it to listen for a hotkey press (default F10) to initiate or start right now?")
 
     if response == "yes":
         messagebox.showinfo("Listening!", "The app is currently listening for a keypress, to stop it press (Esc) to stop or close the app.")
