@@ -16,8 +16,8 @@ listenerTrigger = False
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 # JSON PATHS FOR SETTINGS AND SENTENCES
-settings_path = os.path.join(BASE_DIR, "settings.json")
-sentences_path = os.path.join(BASE_DIR, "sentences.json")
+settings_path = os.path.join(BASE_DIR,"storage/", "settings.json")
+sentences_path = os.path.join(BASE_DIR,"storage/", "sentences.json")
 
 # ================ CLEAR INPUT FUNCTION ================= #
 #                   Clears userOption                     #
@@ -426,6 +426,7 @@ def optionSelect(event=None):
                 with open(sentences_path, "w") as f:
                     json.dump(sentenceList, f)
                 messagebox.showinfo("Success", "The macro was deleted successfully.")
+                clearInput()
             else:
                 messagebox.showinfo("Cancelled", "Invalid selection.")
         # Settings
