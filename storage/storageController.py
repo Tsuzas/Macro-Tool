@@ -13,9 +13,9 @@ BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 settings_path = os.path.join(BASE_DIR, "settings.json")
 sentences_path = os.path.join(BASE_DIR, "sentences.json")
 
-def load_json(file_path, default = None):
-    if default is None:
-        default = {}
+def load_json(file_path):
+    
+    default = {}
 
     if not os.path.exists(file_path):
         return default

@@ -6,18 +6,13 @@ import tkinter as tk
 from pynput import keyboard
 from pynput.keyboard import Controller, Key
 from tkinter import simpledialog, messagebox
+# IMPORTS CONSTANTS FOR MAIN USE
+import constants as constants
 
 # LISTENER VARIABLE FOR CONTINUOUS LOOPS    
 stopFlag = False
 # LISTENER VARIABLE FLAG
 listenerTrigger = False
-
-#CHANGES THE JSON PATH TO THE CURRENT FOLDER
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# JSON PATHS FOR SETTINGS AND SENTENCES
-settings_path = os.path.join(BASE_DIR, "settings.json")
-sentences_path = os.path.join(BASE_DIR, "sentences.json")
 
 # ================ CLEAR INPUT FUNCTION ================= #
 #                   Clears userOption                     #
@@ -36,7 +31,7 @@ def saveMacro(event=None):
     else:
         macro = userOption.get()
         sentenceList.append(macro)
-        with open(sentences_path, "w") as f:
+        with open(constants.SENTENCES_PATH, "w") as f:
             json.dump(sentenceList, f)
         messagebox.showinfo("Saved", f"Macro saved: {macro}")
         clearInput()
@@ -59,7 +54,7 @@ def editMacro():
             messagebox.showinfo("Canceled", "Empty input. Leaving...")
         else:
             sentenceList[macroEdit] = editMode
-            with open(sentences_path, "w") as f:
+            with open(constants.SENTENCES_PATH, "w") as f:
                 json.dump(sentenceList, f)
             messagebox.showinfo("Edited", "Macro edited successfully!")
     else:
@@ -69,75 +64,107 @@ def editMacro():
 #     # VIA jSon #     #
 def loadSettings():
     try:
-        with open(settings_path, "r") as f:
+        with open(constants.SETTINGS_PATH, "r") as f:
             return json.load(f)
     except:
         # Default values if file doesn't exist
-        return {
-            "delay_speed": 5,
-            "macro_speed": 0.1,
-            "loops": 1
-        }
+        return constants.DEFAULT_SETTINGS
 
 # ================ SAVE SETTINGS FUNCTION ================== #
-#       Defines time for input, input speed, and loops       #
+#       Defines time for input, input speed, and loops
+#                   and HotkeyListener                       #
 def saveSettings():
-    global settingList, delayOption, macroSpeedOption, loopOption, delayWindow, macroSpeed, loop, delayWindow
+    global settings, delayOption, macroSpeedOption, loopOption, delayWindow, macroSpeed, loop, delayWindow, clickOption
 
-    settingList = {}  # clean list
+    settings = {}  # clean list
 
 
     # =================== DELAY SPEED SETTINGS ========================== #
     delayHolder = delayOption.get()
     if delayHolder == "Default is: 5 seconds." or delayHolder == "":
         delayValue = 5.0
-        messagebox.showinfo("Empty Field Detected", "Delay empty → Defaulting to 5 seconds.")
+        delayText = "Delay → Defaulting to 5 seconds."
     else:
-        delayValue= float(delayHolder)
+        delayValue = float(delayHolder)
+        delayText = "Delay → " + str(delayValue) + " seconds."
 
-    settingList["delay_speed"] = delayValue  
+    settings["delay_speed"] = delayValue  
     # =================================================================== #
 
     # ====================== MACRO SPEEDSETTINGS ======================= #
     macroHolder = macroSpeedOption.get()
     if macroHolder == "Default is: 0.1 second."or macroHolder == "":
         macro = 0.1
-        messagebox.showinfo("Empty Field Detected", "Macro speed empty → Defaulting to 0.1 seconds.")
+        macroText = "Macro → Defaulting to 0.1 seconds."
     else:
         macro = float(macroHolder)
+        macroText = "Macro → " + str(macro)
     
-    settingList["macro_speed"] = macro
+    settings["macro_speed"] = macro
     # =================================================================== #
 
     # ========================== LOOPS SETTINGS ======================= #
     loopHolder = loopOption.get()
     if loopHolder == "Default is: 1 loop." or loopHolder == "":
         loop = 1
-        messagebox.showinfo("Empty Field Detected", "Loop empty → Defaulting to 1 seconds.")
+        loopText = "Loop → Defaulting to 1 seconds."
     else:
         loop = float(loopHolder)
+        loopText = "Loop → " + str(loop)
    
-    settingList["loops"] = loop
+    settings["loops"] = loop
     # =================================================================== #
 
-    # Saves JSON
-    
-    with open(settings_path, "w") as f:
-        json.dump(settingList, f, indent=4)
+    # ========================== LISTENER SETTINGS ======================= #
+    listenerHolder = listenerOption.get()
+    if listenerHolder == "Default is: f10" or listenerHolder == "":
+        listener = "f10"
+        listenerText = "Listener → Defaulting to F10."
+    else:
+        listener = listenerHolder
+        listenerText = "Listener → " + listenerHolder
 
-    messagebox.showinfo("Saved", "Settings saved successfully!")
+    settings["listener"] = listener
+
+    # =================================================================== #
+
+    # ========================== AUTO CLICK SETTINGS ======================= #
+    clickHolder = clickOption.get()
+    if clickHolder == "Default is: f11" or clickHolder == "":
+        click = "f11"
+        clickText = "Auto Click → Defaulting to F11."
+    else:
+        click = clickHolder
+        clickText = "Auto Click → " + clickHolder
+
+    settings["click"] = click
+
+    # =================================================================== #
+    
+    # Saves JSON
+    print("Saving to:", constants.SETTINGS_PATH)
+    print(settings)
+    with open(constants.SETTINGS_PATH, "w") as f:
+        json.dump(settings, f, indent=4)
+
+    print("Settings saved successfully!")
+    
+    messagebox.showinfo("Settings Saved", f"Your settings were saved successfully!\n\n{delayText}\n{macroText}\n{loopText}\n{listenerText}\n{clickText}")
 
     delayWindow.pack_forget()
     delayOption.pack_forget()
     macroSpeedOption.pack_forget()
     loopOption.pack_forget()
-    
+    clickOption.pack_forget()
+
     resetMacrosButton.pack_forget()
     selectButton.pack_forget()
     
     topFrame.pack_forget()
     topFrame2.pack_forget()
     topFrame3.pack_forget()
+    topFrame4.pack_forget()
+    topFrame5.pack_forget()
     
     goBackMenu()
 
@@ -147,7 +174,7 @@ def resetMacros():
     global sentenceList
     
     sentenceList = []
-    with open(sentences_path, "w") as f:
+    with open(constants.SENTENCES_PATH, "w") as f:
         json.dump(sentenceList, f, indent=4)
     messagebox.showinfo("MACROS Reset","All your macros were sucessfully deleted")
     
@@ -158,6 +185,8 @@ def resetMacros():
     topFrame.pack_forget()
     topFrame2.pack_forget()
     topFrame3.pack_forget()
+    topFrame4.pack_forget()
+    topFrame5.pack_forget()
     resetMacrosButton.pack_forget()
     
     goBackMenu()
@@ -181,9 +210,17 @@ def entryFocusIn(event):
         widget.delete(0, 'end')
         widget.config(fg="Black")
 
+    if widget is listenerOption and widget.get() == "Default is: f10":
+        widget.delete(0, 'end')
+        widget.config(fg="Black")
+
+    if widget is clickOption and widget.get() == "Default is: f11":
+        widget.delete(0, 'end')
+        widget.config(fg="Black")
+
 # ================ CREATES SETTING WINDOWS  ================== #
 def settingsWindow():
-    global delayWindow, delayOption,macroSpeed, macroSpeedOption, loop, loopOption, resetMacrosButton, sentenceList
+    global delayWindow, delayOption,macroSpeed, macroSpeedOption, loop, loopOption, resetMacrosButton, sentenceList, listenerOption, clickOption, topFrame, topFrame2, topFrame3, topFrame4, topFrame5
     
     clearInput()
     root.title("Settings")
@@ -200,12 +237,17 @@ def settingsWindow():
         widget.destroy()
     for widget in topFrame3.winfo_children():
         widget.destroy()
+    for widget in topFrame4.winfo_children():
+        widget.destroy()
+    for widget in topFrame5.winfo_children():
+        widget.destroy()
         
     # Show the frames
     topFrame.pack(pady=3)
     topFrame2.pack(pady=3)
     topFrame3.pack(pady=3)
-
+    topFrame4.pack(pady=3)
+    topFrame5.pack(pady=3)
     
     # ======== 1st Line DELAY BEFORE MACRO =========== #
     delayWindow = tk.Label(topFrame)
@@ -236,7 +278,29 @@ def settingsWindow():
     loopOption.insert(0, "Default is: 1 loop.")
     loopOption.bind("<FocusIn>", entryFocusIn)
     # ================================================ #
+
     
+
+    # ================ LISTENER ================== #
+    listener = tk.Label(topFrame4)
+    listener.config(text="Listener Key: ")
+    listener.pack(side="left", padx=5)
+    listenerOption = tk.Entry(topFrame4, fg="Gray")
+    listenerOption.pack(side="left", padx=5)
+    listenerOption.insert(0, "Default is: f10")
+    listenerOption.bind("<FocusIn>", entryFocusIn)
+    # ================================================ #
+    
+    # ================ AUTO CLICK ================== #
+    click = tk.Label(topFrame5)
+    click.config(text="Auto Click: ")
+    click.pack(side="left", padx=5)
+    clickOption = tk.Entry(topFrame5, fg="Gray")
+    clickOption.pack(side="left", padx=5)
+    clickOption.insert(0, "Default is: f11")
+    clickOption.bind("<FocusIn>", entryFocusIn)
+    # ================================================ #
+
     # ================ SAVING BUTTON ================== #
     selectButton.config(text="Save Settings!", command=saveSettings)
     selectButton.pack(pady=5)
@@ -283,14 +347,26 @@ def optionSelect(event=None):
             else:
                 infoText = "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList))
                 messagebox.showinfo("Macro List", infoText)
-        case 3:
             # If no macros, quick display alerting User, if there's Sentences editMacro()
+        case 3:
             clearInput()
             if not sentenceList:
                 messagebox.showinfo("Macros", "No macros to edit.")
             else:
                 editMacro()
+        #Delete specific index of Macro
         case 4:
+            deleteMacro = simpledialog.askinteger("Delete Macro", "Choose the macro to delete:\n" + "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList)))
+
+            if deleteMacro is not None and 0 <= deleteMacro < len(sentenceList):
+                del sentenceList[deleteMacro]
+                with open(constants.SENTENCES_PATH, "w") as f:
+                    json.dump(sentenceList, f)
+                messagebox.showinfo("Success", "The macro was deleted successfully.")
+                clearInput()
+            else:
+                messagebox.showinfo("Cancelled", "Invalid selection.")
+        case 5:
             clearInput()
             if not sentenceList:
                 messagebox.showinfo("Macros", "No macros saved yet.")
@@ -317,12 +393,12 @@ def optionSelect(event=None):
 
                     # What types for you
                     kb = Controller()
-                    loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                    loops = int(settings["loops"])  # convert to int para rodar no FOR
                     for _ in range(loops):
                         for letter in macroWord:
                             print(letter)
                             kb.tap(letter)
-                            time.sleep(settingList["macro_speed"])
+                            time.sleep(settings["macro_speed"])
                         kb.tap(Key.enter)
                     listenerTrigger = False
                 messagebox.showinfo("Success", "The macro was executed successfully.")
@@ -332,29 +408,18 @@ def optionSelect(event=None):
                 # Quick warning, alerting user to, after clicking ok, swithc to wanted window.
                 messagebox.showinfo(
                     "Macro Starting...",
-                    f'-- {macroWord} -- will start typing in {settingList["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
+                    f'-- {macroWord} -- will start typing in {settings["delay_speed"]} seconds after closing this window.\nPrepare the target window!'
                 )
-                time.sleep(settingList["delay_speed"])
+                time.sleep(settings["delay_speed"])
                 # What types for you
                 kb = Controller()
-                loops = int(settingList["loops"])  # convert to int para rodar no FOR
+                loops = int(settings["loops"])  # convert to int para rodar no FOR
                 for _ in range(loops):
                     for letter in macroWord:
                         kb.tap(letter)
-                        time.sleep(settingList["macro_speed"])
+                        time.sleep(settings["macro_speed"])
                     kb.tap(Key.enter)
                 messagebox.showinfo("Success", "The macro was executed successfully.")
-        #Delete specific index of Macro
-        case 5:
-            deleteMacro = simpledialog.askinteger("Delete Macro", "Choose the macro to delete:\n" + "\n".join(f"[{i}] --> {word}" for i, word in enumerate(sentenceList)))
-
-            if deleteMacro is not None and 0 <= deleteMacro < len(sentenceList):
-                del sentenceList[deleteMacro]
-                with open(sentences_path, "w") as f:
-                    json.dump(sentenceList, f)
-                messagebox.showinfo("Success", "The macro was deleted successfully.")
-            else:
-                messagebox.showinfo("Cancelled", "Invalid selection.")
         # Settings
         case 8:
             settingsWindow()
@@ -370,12 +435,12 @@ def optionSelect(event=None):
 # ================ MAIN MENU ================== #
 #           Creates the first menu              #
 def mainMenu():
-    global root, userOption, mainLabel, selectButton, sentenceList, topFrame, topFrame2, topFrame3, settingList
+    global root, userOption, mainLabel, selectButton, sentenceList, topFrame, topFrame2, topFrame3, settings, topFrame4, topFrame5
     
-    settingList = loadSettings()
+    settings = loadSettings()
     
     try:
-        with open(sentences_path, "r") as f:
+        with open(constants.SENTENCES_PATH, "r") as f:
             content = f.read()
             sentenceList = json.loads(content)
     except Exception as e:
@@ -383,33 +448,24 @@ def mainMenu():
         sentenceList = []
     
     root = tk.Tk()
-    root.title("Macro Tool")
-    root.geometry("300x300")
+    root.title(constants.TITLE) 
+    root.geometry(constants.RESOLUTION) 
     
-    # Sets the icon for the application with try catch preventing error 
-    icon_path = os.path.join(BASE_DIR, "media", "icon.png")
     try:
-        icon = tk.PhotoImage(file=icon_path)
+        icon = tk.PhotoImage(file= constants.ICON_PATH)
         root.iconphoto(True, icon)
     except Exception as e:
         print(f"Error loading icon: {e}")
         pass
-    # Create a frame to hold label and entry on same line
+
+    # FRAMES CREATIONS BRACKET
     topFrame = tk.Frame(root)
     topFrame2 = tk.Frame(root)
     topFrame3 = tk.Frame(root)
+    topFrame4 = tk.Frame(root)
+    topFrame5 = tk.Frame(root)
 
-    mainLabel = tk.Label(root, text=(
-        "Welcome to the macro tool!\n"
-        "Choose an option:\n\n"
-        "[1] Record a macro\n"
-        "[2] See your macros\n"
-        "[3] Edit a macro\n"
-        "[4] Execute a macro\n"
-        "[5] Delete a macro\n"
-        "[8] Settings\n"
-        "[9] Exit\n"
-    ))
+    mainLabel = tk.Label(root, text=constants.MAIN_MENU_TEXT)
     mainLabel.pack(pady=6, padx=6)
 
     userOption = tk.Entry(root)
@@ -433,17 +489,7 @@ def goBackMenu():
     selectButton.pack(pady=6, padx=6)
     
     # Re assigns the proper text on the main Label.
-    mainLabel.config(text=(
-        "Welcome to the macro tool!\n"
-        "Choose an option:\n\n"
-        "[1] Record a macro\n"
-        "[2] See your macros\n"
-        "[3] Edit a macro\n"
-        "[4] Execute a macro\n"
-        "[5] Delete a macro\n"
-        "[8] Settings\n"
-        "[9] Exit\n"
-    ))
+    mainLabel.config(text= constants.mainMenuText)
     
     # Re assigns the proper command on the button.
     selectButton.config(text="Choose", command=optionSelect)
@@ -451,10 +497,16 @@ def goBackMenu():
 # ================ LISTENER ================== #
 def on_press(key):
         global listenerTrigger, stopFlag
+        listenerKey = settings["listener"].lower()  # Get the listener key from settings and convert to lowercase
+        if len(listenerKey) == 1:
+            trigger_key = keyboard.KeyCode.from_char(listenerKey)  # Convert to KeyCode for single character
+        else:
+            trigger_key = keyboard.Key[listenerKey]  # Convert to Key for special keys
+
         if key == keyboard.Key.esc:
             stopFlag = True
             return
-        elif key == keyboard.Key.f10:
+        elif key == trigger_key:
             listenerTrigger = True
             return
         try:

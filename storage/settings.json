@@ -1,7 +1,7 @@
 {
-    "delay_speed": 5.0,
-    "macro_speed": 0.1,
-    "loops": 1,
-    "listener": "f10",
+    "delay_speed": 1.0,
+    "macro_speed": 0.001,
+    "loops": 1.0,
+    "listener": "f1",
     "click": "f11"
 }
